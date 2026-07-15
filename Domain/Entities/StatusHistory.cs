@@ -8,5 +8,5 @@ public class StatusHistory : BaseEntity
     public ApplicationStatus Status { get; set; }
     public DateTime ChangedAt { get; set; }
     public string? Notes { get; set; }
-    public JobApplication? JobApplication { get; set; }
+    public JobApplication JobApplication { get; set; } = null!;
 }

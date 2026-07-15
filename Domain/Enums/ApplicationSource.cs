@@ -6,7 +6,7 @@ public enum ApplicationSource
     Referral,
     CompanyWebsite,
     JobBoard,
-    SocailMedia,
+    SocialMedia,
     Other
 }
 

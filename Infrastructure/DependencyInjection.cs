@@ -1,5 +1,5 @@
 ﻿using FluentMigrator.Runner;
-using Infrastructure.Persistance;
+using Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
@@ -12,8 +12,7 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        services
-            .AddFluentMigratorCore()
+        services.AddFluentMigratorCore()
             .ConfigureRunner(rb => rb
                 .AddMySql8()
                 .WithGlobalConnectionString(connectionString)
