@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using FluentMigrator.Runner;
+using Infrastructure.Authentication;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
 using Infrastructure.Security;
@@ -28,8 +29,16 @@ public static class DependencyInjection
             connectionString,
             ServerVersion.AutoDetect(connectionString)));
 
-        services.AddScoped<IUserRepository, UserRepository>();
+        // Jwt configuration
+        services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
+
+        // Services
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+        // Repositories
+        services.AddScoped<IUserRepository, UserRepository>();
+        
 
         return services;
     }
