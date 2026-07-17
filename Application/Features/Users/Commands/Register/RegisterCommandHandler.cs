@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Application.Features.Users.Commands.Register;
 
-public sealed class RegisterCommandHandler(
+public class RegisterCommandHandler(
     IUserRepository userRepository,
     IPasswordHasher passwordHasher,
     IJwtTokenGenerator jwtTokenGenerator

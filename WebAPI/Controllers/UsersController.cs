@@ -1,4 +1,5 @@
-﻿using Application.Features.Users.Commands.Register;
+﻿using Application.Features.Users.Commands.Login;
+using Application.Features.Users.Commands.Register;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +24,7 @@ public class UsersController(ISender sender) : ControllerBase
         [FromBody] LoginCommand command,
         CancellationToken cancellationToken)
     {
-        var result -await sender.Send(command, cancellationToken);
+        var result = await sender.Send(command, cancellationToken);
         return Ok(result);
     }
 
