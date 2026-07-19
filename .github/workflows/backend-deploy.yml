@@ -42,10 +42,10 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Restore Dependencies
-        run: dotnet restore JobTracker.sln
+        run: dotnet restore JobTracker.slnx
 
       - name: Build Solution
-        run: dotnet build JobTracker.sln --configuration Release --no-restore
+        run: dotnet build JobTracker.slnx --configuration Release --no-restore
 
       - name: Publish Web API
         run: |
