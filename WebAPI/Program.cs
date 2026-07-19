@@ -1,6 +1,6 @@
-using Infrastructure;
 using Application;
-using Microsoft.Extensions.DependencyInjection;
+using Infrastructure;
+using WebAPI.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +21,8 @@ builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(ApplicationAssemblyReference).Assembly);
 });
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
