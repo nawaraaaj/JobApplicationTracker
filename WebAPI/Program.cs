@@ -41,10 +41,13 @@ using (var scope = app.Services.CreateScope())
     runner.MigrateUp();
 }
 
+app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowReactApp");
 
-app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();

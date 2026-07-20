@@ -41,6 +41,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
+      - name: Clean previous build outputs
+        run: |
+          rm -rf ${{ env.PUBLISH_PATH }}
+          find . -type d -name "bin" -exec rm -rf {} + 2>/dev/null || true
+          find . -type d -name "obj" -exec rm -rf {} + 2>/dev/null || true
+
       - name: Restore Dependencies
         run: dotnet restore JobTracker.slnx
 
