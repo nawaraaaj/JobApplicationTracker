@@ -54,6 +54,11 @@ jobs:
             --no-build \
             --output ${{ env.PUBLISH_PATH }}
 
+      - name: Inspect publish output
+        run: |
+          echo "===== Publish Output ====="
+          find ${{ env.PUBLISH_PATH }} -type f | sort
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
