@@ -3,17 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { Loader2, Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
-
-import { login } from "../../api/authApi";
 import type { LoginRequest } from "../../types/auth.types";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AuthLayout from "../Auth/AuthLayout";
+import { useAuth } from "../../lib/Auth/AuthContext";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [form, setForm] = useState<LoginRequest>({
     email: "",
@@ -48,12 +47,9 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await login({ email, password });
-
-      localStorage.setItem("accessToken", response.accessToken);
-
+      await login({email, password});
       toast.success("Logged in successfully.");
-      navigate("/");
+      navigate("/dashboard");
     } catch (err) {
       const message = axios.isAxiosError(err)
         ? (err.response?.data?.message ?? "Login failed. Please try again.")

@@ -12,7 +12,9 @@ export interface LoginRequest {
 
 export interface AuthResponse {
     accessToken: string;
+    refreshToken: string;
     expiresAtUtc: string;
+    user: UserDto;
 }
 
 export interface UserDto {

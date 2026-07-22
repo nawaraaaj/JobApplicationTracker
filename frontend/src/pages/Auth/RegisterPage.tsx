@@ -1,25 +1,19 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Loader2,
-  User,
-  Mail,
-  ArrowRight,
-  Lock,
-  Eye,
-  EyeOff,
+import { Loader2, User, Mail, ArrowRight, Lock, Eye, EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
-import { register } from "../../api/authApi";
 import type { RegisterRequest } from "../../types/auth.types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "../../lib/Auth/AuthContext";
 import AuthLayout from "../Auth/AuthLayout";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const [form, setForm] = useState<RegisterRequest>({
     name: "",
@@ -66,14 +60,14 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await register({
+      await register({
         ...form,
         name: form.name.trim(),
         email: form.email.trim(),
       });
+
       toast.success("Account created successfully.");
-      localStorage.setItem("accessToken", response.accessToken);
-      navigate("/");
+      navigate("/dashboard");
     } catch (err: unknown) {
       const message = axios.isAxiosError(err)
         ? (err.response?.data?.message ??
