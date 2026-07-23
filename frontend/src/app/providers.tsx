@@ -9,8 +9,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         {children}
-        <Toaster position="bottom-right" richColors closeButton />
       </AuthProvider>
+      <Toaster position="bottom-right" richColors closeButton />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
