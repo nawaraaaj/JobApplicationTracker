@@ -1,5 +1,6 @@
 using Application;
 using Infrastructure;
+using WebAPI;
 using WebAPI.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +28,7 @@ builder.Services.AddMediatR(cfg =>
 });
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.AddPresentation();
 
 var app = builder.Build();
 
