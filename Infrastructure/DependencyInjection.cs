@@ -7,6 +7,7 @@ using Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 
 namespace Infrastructure;
@@ -29,6 +30,10 @@ public static class DependencyInjection
             connectionString,
             ServerVersion.AutoDetect(connectionString)));
 
+        services.AddHealthChecks()
+           .AddCheck("self", () => HealthCheckResult.Healthy())
+           .AddDbContextCheck<ApplicationDbContext>("database");
+
         // Jwt configuration
         services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
 
@@ -38,6 +43,7 @@ public static class DependencyInjection
 
         // Repositories
         services.AddScoped<IAuthRepository, AuthRepository>();
+        //services.AddScoped<IJobApplicationsRepository, JobApplicationsRepository>();
         
 
         return services;
