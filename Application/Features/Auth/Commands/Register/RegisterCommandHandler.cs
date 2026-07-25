@@ -1,15 +1,18 @@
 ﻿using Application.Common.Results;
+using Application.Features.Auth.Commands.Login;
 using Application.Features.Auth.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Auth.Commands.Register;
 
 public class RegisterCommandHandler(
     IAuthRepository userRepository,
     IPasswordHasher passwordHasher,
-    IJwtTokenGenerator jwtTokenGenerator
+    IJwtTokenGenerator jwtTokenGenerator,
+     ILogger<RegisterCommandHandler> logger
 ) : IRequestHandler<RegisterCommand, Result<AuthResponseDto>>
 {   
     public async Task<Result<AuthResponseDto>> Handle(
@@ -24,6 +27,7 @@ public class RegisterCommandHandler(
 
         if (emailTaken)
         {
+            logger.LogInformation("Failed registration attempt for email {Email}", normalizedEmail);
             return Result<AuthResponseDto>.Failure(new Error("EMAIL_ALREADY_EXISTS", "Email already exists", ErrorType.Conflict));
         }
 
@@ -37,6 +41,7 @@ public class RegisterCommandHandler(
 
         await userRepository.AddAsync(user, cancellationToken);
         await userRepository.SaveChangesAsync(cancellationToken);
+        logger.LogInformation("New user registered with email: {Email}", user.Email);
 
         var (token, expiresAtUtc) = jwtTokenGenerator.GenerateToken(user);
 
