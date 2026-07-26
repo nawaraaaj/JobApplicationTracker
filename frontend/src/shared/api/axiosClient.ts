@@ -25,14 +25,21 @@ axiosClient.interceptors.response.use(
         return Promise.reject(new Error(result.error?.message ?? "Request failed"));
     },
     (error: AxiosError) => {
-        if (error.response?.status === 401) {
+        const isAuthEndpoint =
+            error.config?.url?.includes("/auth/login") ||
+            error.config?.url?.includes("/auth/register");
+
+        if (error.response?.status === 401 && !isAuthEndpoint) {
             localStorage.removeItem("accessToken");
             localStorage.removeItem("user");
             window.location.href = "/login";
         }
 
-        const result = error.response?.data as Result<unknown> | undefined;
-        const message = result?.error?.message ?? error.message;
+        const apiError = error.response?.data as
+            | { isSuccess: boolean; error?: { code?: string; message?: string; type?: string } }
+            | undefined;
+
+        const message = apiError?.error?.message ?? error.message;
         return Promise.reject(new Error(message));
-    }
+    },
 );

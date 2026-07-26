@@ -2,6 +2,7 @@
 using Application.Features.Auth.Commands.Register;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Extensions;
 
 namespace WebAPI.Controllers;
 
@@ -16,7 +17,7 @@ public class AuthController(ISender sender) : ControllerBase
     {
         var result = await sender.Send(command, cancellationToken);
 
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     [HttpPost("login")]
@@ -25,7 +26,7 @@ public class AuthController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return Ok(result);
+        return result.ToActionResult();
     }
 
 }

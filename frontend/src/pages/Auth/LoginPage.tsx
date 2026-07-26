@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2, Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import axios from "axios";
 import type { LoginRequest } from "../../types/auth.types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,13 +46,11 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login({email, password});
+      await login({ email, password });
       toast.success("Logged in successfully.");
       navigate("/dashboard");
     } catch (err) {
-      const message = axios.isAxiosError(err)
-        ? (err.response?.data?.message ?? "Login failed. Please try again.")
-        : "An unexpected error occurred.";
+      const message = err instanceof Error ? err.message : "An unexpected error occurred.";
 
       setError(message);
       toast.error(message);

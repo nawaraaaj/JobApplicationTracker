@@ -1,10 +1,11 @@
-﻿using Application.Common.Results;
-using Application.Features.JobApplications.Commands.CreateJobApplication;
+﻿using Application.Features.JobApplications.Commands.CreateJobApplication;
 using Application.Features.JobApplications.Commands.DeleteJobApplication;
 using Application.Features.JobApplications.Commands.UpdateJobApplication;
 using Application.Features.JobApplications.Queries.GetJobApplicationById;
+using Application.Features.JobApplications.Queries.GetJobApplications;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Extensions;
 
 namespace WebAPI.Controllers;
 
@@ -17,21 +18,29 @@ public class JobApplicationController(ISender sender) : ControllerBase
     {
         var query = new GetJobApplicationByIdQuery { Id = id };
         var result = await sender.Send(query, cancellationToken);
-        return Ok(result);
+        return result.ToActionResult();
+    }
+
+    [HttpGet("get-all")]
+    public async Task<IActionResult> GetJobApplications(CancellationToken cancellationToken)
+    {
+        var query = new GetJobApplicationsQuery();
+        var result = await sender.Send(query, cancellationToken);
+        return result.ToActionResult();
     }
 
     [HttpPost("create")]
     public async Task<IActionResult> CreateJobApplication([FromBody] CreateJobApplicationCommand command, CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return Ok(result);
+        return result.ToCreatedResult(nameof(GetJobApplicationById), new { id = result.Value });
     }
 
     [HttpPut("update")]
     public async Task<IActionResult> UpdateJobApplication([FromBody] UpdateJobApplicationCommand command, CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     [HttpDelete("delete/{id}")]
@@ -39,6 +48,6 @@ public class JobApplicationController(ISender sender) : ControllerBase
     {
         var command = new DeleteJobApplicationCommand { Id = id };
         var result = await sender.Send(command, cancellationToken);
-        return Ok(result);
+        return result.ToActionResult();
     }
 }

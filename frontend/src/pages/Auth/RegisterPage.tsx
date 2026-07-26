@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Loader2, User, Mail, ArrowRight, Lock, Eye, EyeOff,
+import {
+  Loader2, User, Mail, ArrowRight, Lock, Eye, EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
-import axios from "axios";
 import type { RegisterRequest } from "../../types/auth.types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -69,10 +69,7 @@ export default function RegisterPage() {
       toast.success("Account created successfully.");
       navigate("/dashboard");
     } catch (err: unknown) {
-      const message = axios.isAxiosError(err)
-        ? (err.response?.data?.message ??
-          "Unable to create your account. Please try again.")
-        : "An unexpected error occurred.";
+      const message = err instanceof Error ? err.message : "An unexpected error occurred.";
       setError(message);
       toast.error(message);
     } finally {

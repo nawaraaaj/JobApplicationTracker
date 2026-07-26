@@ -1,5 +1,8 @@
-﻿namespace Application.Common.Results;
+﻿using System.Text.Json.Serialization;
 
+namespace Application.Common.Results;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ErrorType
 {
     Validation,
