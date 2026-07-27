@@ -34,9 +34,9 @@ export function AppLayout() {
         >
           <Menu className="h-6 w-6" />
         </button>
-        <span className="mono text-xs font-bold uppercase tracking-wider text-slate-900">
-          Dossier Archival
-        </span>
+        <span className="font-mono text-xl font-bold tracking-tight text-[#050e1a] sm:text-2xl md:text-3xl">
+            Application Tracker
+          </span>
       </header>
 
       <div className="min-h-screen p-6 lg:ml-64">

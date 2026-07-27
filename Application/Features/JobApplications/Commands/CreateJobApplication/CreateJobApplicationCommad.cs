@@ -4,13 +4,15 @@ using MediatR;
 
 namespace Application.Features.JobApplications.Commands.CreateJobApplication;
 
-public record CreateJobApplicationCommand(
-    string CompanyName,
-    string JobTitle,
-    string? Location,
-    DateTime AppliedDate,
-    string? Salary,
-    string? Notes,
-    ApplicationStatus CurrentStatus,
-    ApplicationSource Source,
-    WorkMode WorkMode) : IRequest<Result<Guid>>;
+public class CreateJobApplicationCommand : IRequest<Result<Guid>>
+{
+    public string CompanyName { get; set; } = string.Empty;
+    public string JobTitle { get; set; } = string.Empty;
+    public string? Location { get; set; }
+    public DateTime AppliedDate { get; set; }
+    public string? Salary { get; set; }
+    public string? Notes { get; set; }
+    public ApplicationStatus CurrentStatus { get; set; }
+    public ApplicationSource Source { get; set; }
+    public WorkMode WorkMode { get; set; }
+}

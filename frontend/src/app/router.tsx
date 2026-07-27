@@ -8,6 +8,7 @@ import { AppLayout } from "../app/AppLayout";
 import Dashboard from "../pages/Dashboard/DashboardPage";
 import { PageNotBuilt } from "../pages/NoPage/PageNotBuilt";
 import { NotFoundPage } from "../pages/NoPage/NotFoundPage";
+import { Applications } from "../pages/JobApplication/Applications";
 
 export const router = createBrowserRouter([
   {
@@ -28,7 +29,7 @@ export const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { path: "/dashboard", element: <Dashboard /> },
-          { path: "/applications", element: <PageNotBuilt title="Applications" /> },
+          { path: "/applications", element: <Applications /> },
           { path: "/pipeline", element: <PageNotBuilt title="Pipeline" /> },
           { path: "/settings", element: <PageNotBuilt title="Settings" /> },
           { path: "/profile", element: <PageNotBuilt title="profile" /> },
