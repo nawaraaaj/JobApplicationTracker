@@ -4,6 +4,7 @@ using Application.Features.JobApplications.Commands.UpdateJobApplication;
 using Application.Features.JobApplications.Queries.GetJobApplicationById;
 using Application.Features.JobApplications.Queries.GetJobApplications;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Extensions;
 
@@ -11,6 +12,7 @@ namespace WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class JobApplicationController(ISender sender) : ControllerBase
 {
     [HttpGet("get/{id}")]

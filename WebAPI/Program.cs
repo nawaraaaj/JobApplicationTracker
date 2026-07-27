@@ -30,7 +30,7 @@ builder.Services.AddMediatR(cfg =>
 });
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
-builder.Services.AddPresentation();
+builder.Services.AddPresentation(builder.Configuration);
 
 var app = builder.Build();
 
