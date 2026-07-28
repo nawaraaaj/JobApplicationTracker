@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Search, X } from "lucide-react";
 import { JobApplicationForm } from "./JobApplicationForm";
 import type {
   JobApplicationDto,
+  JobApplicationListItemDto,
   CreateJobApplicationRequest,
   UpdateJobApplicationRequest,
 } from "@/types/jobApplications.types";
 import { JobApplicationList } from "./JobApplicationList";
-import { getAll, create, update } from "../../api/jobApplicaitionsApi";
+import { getAll, getById, create, update } from "../../api/jobApplicaitionsApi"
 
 type PanelState =
   | { open: false }
@@ -17,11 +18,21 @@ type PanelState =
 
 export function Applications() {
   const [panel, setPanel] = useState<PanelState>({ open: false });
-  const [applications, setApplications] = useState<JobApplicationDto[]>([]);
+  const [applications, setApplications] = useState<JobApplicationListItemDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Shared helper used after create/update
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredApplications = applications.filter((app) => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return true;
+    return (
+      app.jobTitle.toLowerCase().includes(term) ||
+      app.companyName.toLowerCase().includes(term)
+    );
+  });
+
   const fetchApplications = async () => {
     setIsLoading(true);
     try {
@@ -34,7 +45,6 @@ export function Applications() {
     }
   };
 
-  // Initial load – async work lives inside the effect
   useEffect(() => {
     let cancelled = false;
 
@@ -62,15 +72,21 @@ export function Applications() {
   }, []);
 
   const openCreate = () => setPanel({ open: true, mode: "create" });
-  const openUpdate = (application: JobApplicationDto) =>
-    setPanel({ open: true, mode: "update", application });
+  const openUpdate = async (application: JobApplicationListItemDto) => {
+  try {
+    const full = await getById(application.id);
+    setPanel({ open: true, mode: "update", application: full });
+  } catch (error) {
+    console.error("Failed to load application details:", error);
+  }
+};
   const closePanel = () => setPanel({ open: false });
 
   const handleCreate = async (data: CreateJobApplicationRequest) => {
     setIsSubmitting(true);
     try {
       await create(data);
-      await fetchApplications(); // refresh list
+      await fetchApplications();
       closePanel();
     } catch (error) {
       console.error("Failed to create application:", error);
@@ -83,7 +99,7 @@ export function Applications() {
     setIsSubmitting(true);
     try {
       await update(data);
-      await fetchApplications(); // refresh list
+      await fetchApplications();
       closePanel();
     } catch (error) {
       console.error("Failed to update application:", error);
@@ -93,24 +109,48 @@ export function Applications() {
   };
 
   return (
-    <div className="flex flex-col gap-lg p-lg">
-      <div className="flex items-center justify-between">
-        <h1 className="font-headline-md text-headline-md text-on-surface">
+    <div className="flex flex-col gap-6 p-6">
+      <div className="flex flex-col gap-3 border-b border-[#050e1a]/15 pb-3 sm:flex-row sm:items-end sm:justify-between">
+        <h1 className="font-mono text-[22px] font-semibold leading-tight tracking-[0.02em] text-[#050e1a]">
           Applications
         </h1>
 
-        <Button
-          variant="outline"
-          onClick={openCreate}
-          className="bg-secondary text-on-secondary hover:bg-secondary/90 font-label-mono text-label-mono uppercase tracking-wider gap-xs rounded-none"
-        >
-          <Plus className="h-4 w-4" />
-          Add Applications
-        </Button>
+        <div className="flex items-center gap-3">
+          
+          <div className="relative w-full sm:w-80">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#050e1a]/40" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search..."
+              className="w-full border border-[#050e1a]/15 bg-[#fcf9f9] py-2 pl-9 pr-8 font-mono text-[13px] text-[#050e1a] placeholder:text-[#050e1a]/35 outline-none transition-colors focus:border-[#835500]"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#050e1a]/40 hover:text-[#835500] transition-colors"
+                aria-label="Clear search"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+
+          <Button
+            variant="outline"
+            onClick={openCreate}
+            className="shrink-0 gap-1.5 rounded-none border border-[#050e1a] bg-[#050e1a] px-3 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-[#fcf9f9] hover:bg-[#835500] hover:border-[#835500] hover:text-[#fcf9f9] transition-colors"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            New Application
+          </Button>
+        </div>
       </div>
 
       <JobApplicationList
-        applications={applications}
+        applications={filteredApplications}
         isLoading={isLoading}
         onRowClick={openUpdate}
       />

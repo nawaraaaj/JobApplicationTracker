@@ -85,6 +85,7 @@ export interface JobApplicationListItemDto {
   id: string;
   companyName: string;
   jobTitle: string;
+  salary?: string;
   location?: string;
   appliedDate: string;
   currentStatus: ApplicationStatus;

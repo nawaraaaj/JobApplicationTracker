@@ -43,25 +43,25 @@ const WORK_MODES: {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
-  { value: "Onsite", label: "On-site", icon: Building2 },
-  { value: "Hybrid", label: "Hybrid", icon: Home },
-  { value: "Remote", label: "Remote", icon: Globe },
-];
+    { value: "Onsite", label: "On-site", icon: Building2 },
+    { value: "Hybrid", label: "Hybrid", icon: Home },
+    { value: "Remote", label: "Remote", icon: Globe },
+  ];
 
 type JobApplicationFormProps =
   | {
-      mode: "create";
-      onSubmit: (data: CreateJobApplicationRequest) => void;
-      onCancel: () => void;
-      isSubmitting?: boolean;
-    }
+    mode: "create";
+    onSubmit: (data: CreateJobApplicationRequest) => void;
+    onCancel: () => void;
+    isSubmitting?: boolean;
+  }
   | {
-      mode: "update";
-      initialData: JobApplicationDto;
-      onSubmit: (data: UpdateJobApplicationRequest) => void;
-      onCancel: () => void;
-      isSubmitting?: boolean;
-    };
+    mode: "update";
+    initialData: JobApplicationDto;
+    onSubmit: (data: UpdateJobApplicationRequest) => void;
+    onCancel: () => void;
+    isSubmitting?: boolean;
+  };
 
 export function JobApplicationForm(props: JobApplicationFormProps) {
   const { mode, onSubmit, onCancel, isSubmitting = false } = props;
@@ -70,9 +70,13 @@ export function JobApplicationForm(props: JobApplicationFormProps) {
   const [companyName, setCompanyName] = useState(initial?.companyName ?? "");
   const [jobTitle, setJobTitle] = useState(initial?.jobTitle ?? "");
   const [location, setLocation] = useState(initial?.location ?? "");
-  const [appliedDate, setAppliedDate] = useState(
-    initial?.appliedDate ? initial.appliedDate.slice(0, 10) : ""
-  );
+  const [appliedDate, setAppliedDate] = useState(() => {
+    if (initial?.appliedDate) {
+      return initial.appliedDate.slice(0, 10);
+    }
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  });
   const [salary, setSalary] = useState(initial?.salary ?? "");
   const [source, setSource] = useState<ApplicationSource | "">(
     initial?.source ?? ""
@@ -264,7 +268,7 @@ export function JobApplicationForm(props: JobApplicationFormProps) {
                     <input
                       id="salary"
                       type="text"
-                      placeholder="$0 - $0"
+                      placeholder="Rs 0 - Rs 0"
                       className="w-full bg-white border-0 border-b border-gray-400/40 focus:border-amber-700 focus:border-b-2 px-2 py-2 font-sans text-[16px] leading-[1.5] text-gray-900 outline-none transition-all placeholder:text-gray-400/60 rounded-none"
                       value={salary}
                       onChange={(e) => setSalary(e.target.value)}
@@ -348,11 +352,10 @@ export function JobApplicationForm(props: JobApplicationFormProps) {
                             type="button"
                             aria-pressed={active}
                             onClick={() => setWorkMode(wm.value)}
-                            className={`flex-1 py-1.5 flex items-center justify-center gap-1.5 transition-colors font-mono text-[13px] leading-[1.4] ${
-                              active
-                                ? "bg-amber-800 text-white border-b-2 border-amber-400"
-                                : "bg-gray-100 hover:bg-gray-200 text-gray-900"
-                            }`}
+                            className={`flex-1 py-1.5 flex items-center justify-center gap-1.5 transition-colors font-mono text-[13px] leading-[1.4] ${active
+                              ? "bg-amber-800 text-white border-b-2 border-amber-400"
+                              : "bg-gray-100 hover:bg-gray-200 text-gray-900"
+                              }`}
                           >
                             <Icon className="h-4 w-4" />
                             {wm.label}
