@@ -1,9 +1,12 @@
 import type { JobApplicationListItemDto } from "@/types/jobApplications.types";
+import { Pencil, Trash2 } from "lucide-react";
 
 interface JobApplicationListProps {
   applications: JobApplicationListItemDto[];
   isLoading: boolean;
-  onRowClick: (application: JobApplicationListItemDto) => void;
+  onCardClick: (application: JobApplicationListItemDto) => void;
+  onEdit: (application: JobApplicationListItemDto) => void;
+  onDelete: (application: JobApplicationListItemDto) => void;
 }
 
 function formatAppliedDate(dateStr: string) {
@@ -14,7 +17,9 @@ function formatAppliedDate(dateStr: string) {
 export function JobApplicationList({
   applications,
   isLoading,
-  onRowClick,
+  onCardClick,
+  onEdit,
+  onDelete,
 }: JobApplicationListProps) {
   if (isLoading) {
     return (
@@ -42,10 +47,18 @@ export function JobApplicationList({
   return (
     <div className="flex flex-wrap items-start gap-4">
       {applications.map((app) => (
-        <button
+        <div
           key={app.id}
-          onClick={() => onRowClick(app)}
-          className="group relative flex w-full flex-col gap-3 overflow-hidden border border-[#050e1a]/15 bg-[#fcf9f9] p-4 text-left transition-all hover:border-[#835500]/50 hover:shadow-[0_2px_8px_rgba(5,14,26,0.06)] md:w-[calc(50%-0.5rem)] xl:w-[calc(33.333%-0.6667rem)]"
+          role="button"
+          tabIndex={0}
+          onClick={() => onCardClick(app)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onCardClick(app);
+            }
+          }}
+          className="group relative flex w-full cursor-pointer flex-col gap-3 overflow-hidden border border-[#050e1a]/15 bg-[#fcf9f9] p-4 text-left transition-all hover:border-[#835500]/50 hover:shadow-[0_2px_8px_rgba(5,14,26,0.06)] md:w-[calc(50%-0.5rem)] xl:w-[calc(33.333%-0.6667rem)]"
         >
           {/* die-cut corner fold */}
           <span
@@ -61,6 +74,31 @@ export function JobApplicationList({
               <span className="truncate font-mono text-[12px] text-[#050e1a]/60">
                 {app.companyName}
               </span>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-1">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(app);
+                }}
+                aria-label="Edit application"
+                className="rounded-none p-1.5 text-[#050e1a]/40 transition-colors hover:bg-[#050e1a]/5 hover:text-[#835500]"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(app);
+                }}
+                aria-label="Delete application"
+                className="rounded-none p-1.5 text-[#050e1a]/40 transition-colors hover:bg-red-50 hover:text-red-700"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
             </div>
           </div>
 
@@ -95,7 +133,7 @@ export function JobApplicationList({
           <span className="mt-auto w-fit rotate-[-4deg] rounded-full border-[1.5px] border-dashed border-[#835500] px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-[#835500]">
             {app.currentStatus}
           </span>
-        </button>
+        </div>
       ))}
     </div>
   );

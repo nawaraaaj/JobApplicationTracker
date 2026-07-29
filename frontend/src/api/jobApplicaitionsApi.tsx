@@ -26,3 +26,6 @@ export const update = async (data: UpdateJobApplicationRequest): Promise<JobAppl
     return response.data;
 }
 
+export const remove = async (id: string): Promise<void> => {
+    await axiosClient.delete(`/jobapplication/delete/${id}`);
+};
