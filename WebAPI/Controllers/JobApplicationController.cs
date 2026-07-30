@@ -3,6 +3,7 @@ using Application.Features.JobApplications.Commands.DeleteJobApplication;
 using Application.Features.JobApplications.Commands.UpdateJobApplication;
 using Application.Features.JobApplications.Queries.GetJobApplicationById;
 using Application.Features.JobApplications.Queries.GetJobApplications;
+using Application.Features.JobApplications.Commands.ChangeJobApplicationStatus;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,14 @@ public class JobApplicationController(ISender sender) : ControllerBase
     [HttpPut("update")]
     public async Task<IActionResult> UpdateJobApplication([FromBody] UpdateJobApplicationCommand command, CancellationToken cancellationToken)
     {
+        var result = await sender.Send(command, cancellationToken);
+        return result.ToActionResult();
+    }
+
+    [HttpPost("change-status/{id}")]
+    public async Task<IActionResult> ChangeJobApplicaitionStatus(Guid id, [FromBody] ChangeJobApplicationStatusCommand command, CancellationToken cancellationToken)
+    {
+        command.Id = id;
         var result = await sender.Send(command, cancellationToken);
         return result.ToActionResult();
     }

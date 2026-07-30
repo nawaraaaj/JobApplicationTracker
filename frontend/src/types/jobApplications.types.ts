@@ -52,11 +52,9 @@ export interface UpdateJobApplicationRequest {
 }
 
 export interface ChangeJobApplicationStatusRequest {
-  id: string;
-  newStatus: ApplicationStatus;
-  notes?: string;
+    status: string;
+    notes?: string;
 }
-
 export interface StatusHistoryDto {
   id: string;
   status: ApplicationStatus;

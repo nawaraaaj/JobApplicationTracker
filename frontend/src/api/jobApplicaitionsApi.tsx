@@ -1,5 +1,6 @@
 import { axiosClient } from "../shared/api/axiosClient";
 import {
+    type ChangeJobApplicationStatusRequest,
     type CreateJobApplicationRequest,
     type JobApplicationDto,
     type JobApplicationListItemDto,
@@ -25,6 +26,10 @@ export const update = async (data: UpdateJobApplicationRequest): Promise<JobAppl
     const response = await axiosClient.put<JobApplicationDto>("/jobapplication/update", data);
     return response.data;
 }
+
+export const changeStatus = async (id: string, data: ChangeJobApplicationStatusRequest): Promise<void> => {
+    await axiosClient.post(`/jobapplication/change-status/${id}`, data);
+};
 
 export const remove = async (id: string): Promise<void> => {
     await axiosClient.delete(`/jobapplication/delete/${id}`);
