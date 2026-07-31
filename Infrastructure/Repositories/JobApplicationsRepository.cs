@@ -30,8 +30,16 @@ public class JobApplicationsRepository(ApplicationDbContext context) : IJobAppli
 
     public async Task UpdateAsync(JobApplication application, CancellationToken cancellationToken)
     {
-        context.JobApplications.Update(application);
-        await context.SaveChangesAsync(cancellationToken);
+
+        foreach (var entry in context.ChangeTracker.Entries<StatusHistory>())
+        {
+            if (entry.State == EntityState.Modified &&
+                !await context.StatusHistories.AnyAsync(x => x.Id == entry.Entity.Id, cancellationToken))
+            {
+                entry.State = EntityState.Added;
+            }
+        }
+            await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<bool> DeleteAsync(JobApplication application, CancellationToken cancellationToken)

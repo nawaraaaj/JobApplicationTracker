@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\JobApplications\Commands\ChangeJobApplicationStatus\" />
     <Folder Include="Features\JobApplications\Queries\GetJobApplicationsByStatus\" />
   </ItemGroup>
 
