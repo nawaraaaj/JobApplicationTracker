@@ -1,4 +1,6 @@
-import type { JobApplicationListItemDto } from "@/types/jobApplications.types";
+import { StatusBadge } from "../../components/layout/StatusBadge";
+import { formatDate } from "../../lib/dateUtil";
+import type { JobApplicationListItemDto } from "../../types/jobApplications.types";
 import { Pencil, Trash2 } from "lucide-react";
 
 interface JobApplicationListProps {
@@ -7,11 +9,6 @@ interface JobApplicationListProps {
   onCardClick: (application: JobApplicationListItemDto) => void;
   onEdit: (application: JobApplicationListItemDto) => void;
   onDelete: (application: JobApplicationListItemDto) => void;
-}
-
-function formatAppliedDate(dateStr: string) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
 export function JobApplicationList({
@@ -118,7 +115,7 @@ export function JobApplicationList({
             )}
             <span className="text-[#050e1a]/20">·</span>
             <span className="font-mono text-[10.5px] uppercase tracking-[0.05em] text-[#050e1a]/45">
-              Applied {formatAppliedDate(app.appliedDate)}
+              Applied {formatDate(app.appliedDate)}
             </span>
             {app.salary && (
               <>
@@ -129,10 +126,7 @@ export function JobApplicationList({
               </>
             )}
           </div>
-
-          <span className="mt-auto w-fit rotate-[-4deg] rounded-full border-[1.5px] border-dashed border-[#835500] px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-[#835500]">
-            {app.currentStatus}
-          </span>
+          <StatusBadge status={app.currentStatus} />
         </div>
       ))}
     </div>

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { getAll, changeStatus } from "@/api/jobApplicaitionsApi";
-import type { ApplicationStatus, JobApplicationListItemDto } from "@/types/jobApplications.types";
+import { getAll, changeStatus } from "../../api/jobApplicaitionsApi";
+import type { ApplicationStatus, JobApplicationListItemDto } from "../../types/jobApplications.types";
 import { COLUMNS, COLUMN_STATUSES, STATUS_TO_COLUMN, groupByColumn, type Column } from "../../lib/Kanban";
-import { KanbanCard } from "../../components/layout/KanbanCard";
-import { StatusSelectionModal } from "@/components/layout/StatusSelectionModal";
+import { KanbanCard } from "./KanbanCard";
+import { StatusSelectionModal } from "../../components/layout/StatusSelectionModal";
 
 interface PendingDrop {
   applicationId: string;
@@ -112,9 +112,9 @@ export function PipelinePage() {
   const grouped = groupByColumn(applications);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-6.5rem)] lg:h-[calc(100vh-3rem)]">
-      <div className="flex-shrink-0 mb-4 pb-3 border-b-2 border-[#835500] flex items-baseline justify-between">
-        <h1 className="font-mono text-xl font-bold text-[#050e1a] uppercase tracking-wide">
+    <div className="flex flex-col h-[calc(100vh-6.5rem)] lg:h-[calc(100vh-3rem)] p-6">
+      <div className="flex-shrink-0 flex flex-col gap-3 border-b border-[#050e1a]/15 pb-3 mb-4 sm:flex-row sm:items-end sm:justify-between">
+        <h1 className="font-mono text-[22px] font-semibold leading-tight tracking-[0.02em] text-[#050e1a]">
           Pipeline
         </h1>
         <span className="font-mono text-xs text-[#44474c]">
@@ -144,9 +144,8 @@ export function PipelinePage() {
                 onDragOver={(e) => handleDragOver(e, column)}
                 onDragLeave={() => handleDragLeave(column)}
                 onDrop={(e) => handleDrop(e, column)}
-                className={`flex-1 min-h-0 overflow-y-auto p-2 flex flex-col gap-2 bg-[#fcf9f9] border border-t-0 rounded-b-sm transition-colors ${
-                  isOver ? "border-[#835500] bg-[#835500]/5" : "border-[#c5c6cc]"
-                }`}
+                className={`flex-1 min-h-0 overflow-y-auto p-2 flex flex-col gap-2 bg-[#fcf9f9] border border-t-0 rounded-b-sm transition-colors ${isOver ? "border-[#835500] bg-[#835500]/5" : "border-[#c5c6cc]"
+                  }`}
               >
                 {grouped[column].length === 0 ? (
                   <div className="text-xs text-[#44474c] font-mono text-center py-4 border border-dashed border-[#c5c6cc] rounded-sm">

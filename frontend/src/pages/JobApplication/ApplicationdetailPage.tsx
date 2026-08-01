@@ -5,18 +5,8 @@ import { JobApplicationForm } from "./JobApplicationForm";
 import { ConfirmDialog } from "../../components/layout/ConfirmDialog";
 import type { JobApplicationDto, UpdateJobApplicationRequest } from "../../types/jobApplications.types";
 import { getById, update, remove } from "../../api/jobApplicaitionsApi";
-
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
-
-function formatDateTime(dateStr: string) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) +
-    " · " +
-    d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-}
+import { formatDateTime } from "../../lib/dateUtil";
+import { formatStatus } from "../../lib/formatStatus";
 
 export function ApplicationDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -203,7 +193,7 @@ export function ApplicationDetailPage() {
               </span>
               <span className="inline-flex items-center gap-1.5 font-mono text-[13px] font-medium text-[#050e1a]">
                 <CalendarDays className="h-3.5 w-3.5 text-[#050e1a]/60" />
-                {formatDate(application.appliedDate)}
+                {formatDateTime(application.appliedDate)}
               </span>
             </div>
 
@@ -264,7 +254,7 @@ export function ApplicationDetailPage() {
                     />
                   )}
                   <span className="font-mono text-[12px] font-semibold uppercase tracking-[0.05em] text-[#050e1a]">
-                    {entry.status}
+                    {formatStatus(entry.status)}
                   </span>
                   <span className="font-mono text-[10.5px] uppercase tracking-[0.05em] text-[#050e1a]/60">
                     {formatDateTime(entry.changedAt)}
