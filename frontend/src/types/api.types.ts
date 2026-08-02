@@ -3,8 +3,6 @@ export interface ApiError {
     message: string;
 }
 
-export interface Result<T> {
-    isSuccess: boolean;
-    value: T | null;
-    error: ApiError | null;
-}
+export type Result<T> =
+    | { isSuccess: true; value: T; error?: never }
+    | { isSuccess: false; value?: never; error: { code: string; message: string; type: string } };

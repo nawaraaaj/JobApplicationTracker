@@ -9,7 +9,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<JobApplication> JobApplications { get; set; }
     public DbSet<StatusHistory> StatusHistories { get; set; }
-   
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,5 +31,8 @@ public class ApplicationDbContext : DbContext
                 modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
             }
         }
+
+        modelBuilder.Entity<RefreshToken>()
+            .HasQueryFilter(rt => !rt.User.IsDeleted);
     }
 }

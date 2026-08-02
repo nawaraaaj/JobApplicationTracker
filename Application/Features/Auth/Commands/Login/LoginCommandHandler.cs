@@ -3,13 +3,16 @@ using Application.Features.Auth.DTOs;
 using Application.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using RefreshTokenEntity = Domain.Entities.RefreshToken;
 
 namespace Application.Features.Auth.Commands.Login;
 
 public class LoginCommandHandler(
-    IAuthRepository userRepository,
+    IAuthRepository authRepository,
     IPasswordHasher passwordHasher,
     IJwtTokenGenerator jwtTokenGenerator,
+    ITokenHasher tokenHasher,
+    IRefreshTokenGenerator refreshTokenGenerator,
     ILogger<LoginCommandHandler> logger
 ) : IRequestHandler<LoginCommand, Result<AuthResponseDto>>
 {
@@ -18,7 +21,7 @@ public class LoginCommandHandler(
     {
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
 
-        var user = await userRepository.GetByEmailAsync(normalizedEmail, cancellationToken);
+        var user = await authRepository.GetByEmailAsync(normalizedEmail, cancellationToken);
 
         if (user == null || !passwordHasher.Verify(request.Password, user.PasswordHash))
         {
@@ -27,12 +30,23 @@ public class LoginCommandHandler(
                 new Error("INVALID_CREDENTIALS", "Invalid email or password", ErrorType.Unauthorized));
         }
 
-        var (token, expiresAtUtc) = jwtTokenGenerator.GenerateToken(user);
+        var (accessToken, accessExpiresAtUtc) = jwtTokenGenerator.GenerateToken(user);
+        var (refreshToken, refreshExpiresAtUtc) = refreshTokenGenerator.GenerateToken();
+
+        await authRepository.AddRefreshTokenAsync(new RefreshTokenEntity
+        {
+            UserId = user.Id,
+            TokenHash = tokenHasher.Hash(refreshToken),
+            ExpiresAtUtc = refreshExpiresAtUtc,
+            CreatedAtUtc = DateTime.UtcNow
+        }, cancellationToken);
+
         logger.LogInformation("User logged in successfully with email: {Email}", user.Email);
         return Result<AuthResponseDto>.Success(new AuthResponseDto
         {
-            AccessToken = token,
-            ExpiresAtUtc = expiresAtUtc,
+            AccessToken = accessToken,
+            RefreshToken = refreshToken,
+            ExpiresAtUtc = accessExpiresAtUtc,
             User = new UserDto
             {
                 Id = user.Id,

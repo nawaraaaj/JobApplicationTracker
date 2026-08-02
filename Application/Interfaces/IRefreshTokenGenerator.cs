@@ -2,5 +2,5 @@
 
 public interface IRefreshTokenGenerator
 {
-    string Generate();
+    (string Token, DateTime ExpiresAtUtc) GenerateToken();
 }

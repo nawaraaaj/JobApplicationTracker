@@ -1,17 +1,19 @@
 ﻿using Application.Common.Results;
-using Application.Features.Auth.Commands.Login;
 using Application.Features.Auth.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using RefreshTokenEntity = Domain.Entities.RefreshToken;
 
 namespace Application.Features.Auth.Commands.Register;
 
 public class RegisterCommandHandler(
-    IAuthRepository userRepository,
+    IAuthRepository authRepository,
     IPasswordHasher passwordHasher,
     IJwtTokenGenerator jwtTokenGenerator,
+    IRefreshTokenGenerator refreshTokenGenerator,
+    ITokenHasher tokenHasher,
      ILogger<RegisterCommandHandler> logger
 ) : IRequestHandler<RegisterCommand, Result<AuthResponseDto>>
 {   
@@ -21,7 +23,7 @@ public class RegisterCommandHandler(
     {
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
 
-        var emailTaken = await userRepository.EmailExistsAsync(
+        var emailTaken = await authRepository.EmailExistsAsync(
             normalizedEmail,
             cancellationToken);
 
@@ -39,16 +41,28 @@ public class RegisterCommandHandler(
             PasswordHash = passwordHasher.Hash(request.Password)
         };
 
-        await userRepository.AddAsync(user, cancellationToken);
-        await userRepository.SaveChangesAsync(cancellationToken);
-        logger.LogInformation("New user registered with email: {Email}", user.Email);
+        await authRepository.AddAsync(user, cancellationToken);
 
         var (token, expiresAtUtc) = jwtTokenGenerator.GenerateToken(user);
+        var (refreshToken, refreshExpiresAtUtc) = refreshTokenGenerator.GenerateToken();
+
+        await authRepository.AddRefreshTokenAsync(new RefreshTokenEntity
+        {
+            UserId = user.Id,
+            TokenHash = tokenHasher.Hash(refreshToken),
+            ExpiresAtUtc = refreshExpiresAtUtc,
+            CreatedAtUtc = DateTime.UtcNow
+        }, cancellationToken);
+
+        await authRepository.SaveChangesAsync(cancellationToken);
+        logger.LogInformation("New user registered with email: {Email}", user.Email);
 
         return Result<AuthResponseDto>.Success(new AuthResponseDto
         {
             AccessToken = token,
+            RefreshToken = refreshToken,
             ExpiresAtUtc = expiresAtUtc,
+            RefreshExpiresAtUtc = refreshExpiresAtUtc,
             User = new UserDto
             {
                 Id = user.Id,

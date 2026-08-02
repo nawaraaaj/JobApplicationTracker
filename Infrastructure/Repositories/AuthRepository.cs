@@ -28,4 +28,16 @@ public class AuthRepository(
     {
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task AddRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken)
+    {
+        await _context.RefreshTokens.AddAsync(refreshToken, cancellationToken);
+    }
+
+    public async Task<RefreshToken?> GetRefreshTokenByHashAsync(string tokenHash, CancellationToken cancellationToken)
+    {
+        return await _context.RefreshTokens
+            .Include(rt => rt.User)
+            .FirstOrDefaultAsync(rt => rt.TokenHash == tokenHash, cancellationToken);
+    }
 }

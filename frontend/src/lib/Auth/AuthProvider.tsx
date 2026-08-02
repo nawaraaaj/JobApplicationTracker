@@ -16,24 +16,26 @@ function getStoredUser(): UserDto | null {
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<UserDto | null>(getStoredUser);
 
-    const persistSession = (accessToken: string, user: UserDto) => {
+    const persistSession = (accessToken: string, refreshToken: string, user: UserDto) => {
         localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("user", JSON.stringify(user));
         setUser(user);
     };
 
     const login = async (data: LoginRequest) => {
         const response = await loginApi(data);
-        persistSession(response.accessToken, response.user);
+        persistSession(response.accessToken, response.refreshToken, response.user);
     };
 
     const register = async (data: RegisterRequest) => {
         const response = await registerApi(data);
-        persistSession(response.accessToken, response.user);
+        persistSession(response.accessToken, response.refreshToken, response.user);
     };
 
     const logout = () => {
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
         localStorage.removeItem("user");
         setUser(null);
     };

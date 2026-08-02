@@ -9,5 +9,6 @@ public class AuthResponseDto
     public string AccessToken { get; init; } = string.Empty;
     public string RefreshToken { get; init; } = string.Empty;
     public DateTime ExpiresAtUtc { get; init; }
+    public DateTime RefreshExpiresAtUtc { get; init; }
     public UserDto User { get; init; } = null!;
 }

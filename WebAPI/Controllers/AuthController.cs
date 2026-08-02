@@ -1,5 +1,6 @@
 ﻿using Application.Features.Auth.Commands.Login;
 using Application.Features.Auth.Commands.Register;
+using Application.Features.Auth.Commands.RefreshToken;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Extensions;
@@ -24,6 +25,15 @@ public class AuthController(ISender sender) : ControllerBase
     public async Task<IActionResult> Login(
         [FromBody] LoginCommand command,
         CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command, cancellationToken);
+        return result.ToActionResult();
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh(
+    [FromBody] RefreshTokenCommand command,
+    CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
         return result.ToActionResult();
