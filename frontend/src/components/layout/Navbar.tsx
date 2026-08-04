@@ -24,16 +24,14 @@ export default function Navbar() {
           <Button
             variant="outline"
             className="rounded-none border-[#050e1a] px-6 font-mono text-xs uppercase tracking-widest text-[#050e1a]"
-          >
-            <Link to="/login">Log In</Link>
-          </Button>
+            render={<Link to="/login">Log In</Link>}
+          />
 
           <Button
             variant="outline"
             className="rounded-none border-[#050e1a] px-6 font-mono text-xs uppercase tracking-widest text-[#050e1a]"
-          >
-            <Link to="/register">Register</Link>
-          </Button>
+            render={<Link to="/register">Register</Link>}
+          />
         </div>
 
         <button

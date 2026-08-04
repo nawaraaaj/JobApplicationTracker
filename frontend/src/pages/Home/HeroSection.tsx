@@ -1,7 +1,11 @@
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export default function HeroSection() {
+
+  const navigate = useNavigate();
+
   return (
     <section className="mx-auto max-w-7xl px-8 py-16 lg:py-8">
       <div className="grid items-center gap-14 lg:grid-cols-12">
@@ -26,16 +30,11 @@ export default function HeroSection() {
           </div>
 
           <div className="flex flex-wrap gap-4">
-            <Button className="rounded-none border border-[#050e1a] bg-[#fdba5b] px-6 py-6 font-mono uppercase tracking-widest text-[#734a00] shadow-[2px_2px_0px_0px_#050e1a] transition-[transform,box-shadow] duration-200 hover:-translate-x-px hover:-translate-y-px hover:bg-[#fdba5b] hover:shadow-[3px_3px_0px_0px_#050e1a]">
+            <Button
+              onClick={() => navigate("/register")}
+              className="cursor-pointer rounded-none border border-[#050e1a] bg-[#fdba5b] px-6 py-6 font-mono uppercase tracking-widest text-[#734a00] shadow-[2px_2px_0px_0px_#050e1a] transition-[transform,box-shadow] duration-200 hover:-translate-x-px hover:-translate-y-px hover:bg-[#fdba5b] hover:shadow-[3px_3px_0px_0px_#050e1a]">
               Get Started
               <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-
-            <Button
-              variant="outline"
-              className="rounded-none border border-[#050e1a] bg-[#fcf9f9] px-6 py-6 font-mono uppercase tracking-widest text-[#050e1a] hover:bg-[#f0edee]"
-            >
-              View Demo
             </Button>
           </div>
         </div>

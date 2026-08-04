@@ -3,14 +3,12 @@ import {
     LayoutDashboard,
     FolderKanban,
     Settings,
-    Plus,
     HelpCircle,
     LogOut,
     X,
     Kanban,
     UserCircle,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -31,7 +29,6 @@ interface SidebarProps {
 export function Sidebar({
     isOpen,
     onClose,
-    onNewEntry,
     onLogout,
 }: SidebarProps) {
     return (
@@ -58,16 +55,6 @@ export function Sidebar({
                     <X className="h-5 w-5" />
                 </button>
             </div>
-
-            <Button
-                variant="outline"
-                onClick={onNewEntry}
-                className="mono mb-6 w-full justify-center gap-2 border-slate-600 bg-transparent text-xs uppercase tracking-widest text-slate-100 hover:bg-white/10 hover:text-slate-100"
-            >
-                <Plus className="h-4 w-4" />
-                New Entry
-            </Button>
-
             <ul className="flex flex-1 flex-col gap-2">
                 {navItems.map(({ to, label, icon: Icon }) => (
                     <li key={to}>
