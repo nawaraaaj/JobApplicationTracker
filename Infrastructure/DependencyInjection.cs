@@ -46,6 +46,7 @@ public static class DependencyInjection
         // Repositories
         services.AddScoped<IAuthRepository, AuthRepository>();
         services.AddScoped<IJobApplicationsRepository, JobApplicationsRepository>();
+        services.AddScoped<IDashboardRepository, DashboardRepository>();
         
 
         return services;

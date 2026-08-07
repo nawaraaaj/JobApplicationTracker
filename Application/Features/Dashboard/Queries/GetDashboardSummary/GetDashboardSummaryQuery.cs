@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Application.Common.Results;
+using Application.Features.Dashboard.DTOs;
+using MediatR;
 
 namespace Application.Features.Dashboard.Queries.GetDashboardSummary;
 
-internal class GetDashboardSummaryQuery
-{
+public class GetDashboardSummaryQuery : IRequest<Result<DashboardSummaryDto>>
+{ 
 }
