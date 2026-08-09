@@ -24,12 +24,12 @@ JobTracker is a personal job application tracking tool built for an individual d
 
 ## Key Features
 
-- Job application CRUD for tracking company, role, location, source, work mode, salary, and notes
-- Status pipeline tracking with current stage and history/timeline support
-- Dashboard analytics and funnel metrics for application counts and status distribution
-- JWT authentication for user-specific access
-- Per-user data isolation so each account only sees its own records
-- Separate backend API and frontend SPA, deployed independently
+- Job application CRUD with create, read, update, delete, and status change operations
+- Status history tracking for each application and current pipeline stage
+- Dashboard summary endpoint for application counts and status distribution
+- JWT authentication with refresh token support
+- Per-user data isolation via authenticated API access
+- Separate backend API and frontend SPA with independent implementation and deployment
 
 ## Tech Stack
 
@@ -43,7 +43,8 @@ JobTracker is a personal job application tracking tool built for an individual d
 - Pomelo.EntityFrameworkCore.MySql 9.0.0
 - FluentMigrator 8.0.1 / FluentMigrator.Runner.MySql 8.0.1
 - JWT authentication via Microsoft.AspNetCore.Authentication.JwtBearer 10.0.10
-- Custom `Result<T>` error handling pattern
+- BCrypt.Net-Next 4.2.0 for password hashing
+- Custom `Result<T>` success/failure pattern
 
 ### Frontend
 
@@ -87,10 +88,12 @@ Infrastructure/
     Migrations/
   Repositories/
   Security/
+  Services/
 WebAPI/
   WebAPI.csproj
   Program.cs
   Controllers/
+```
 
 ### Dependency Flow
 
@@ -120,12 +123,16 @@ frontend/
       Auth/
       Dashboard/
       Home/
+      JobApplication/
+      Pipeline/
       NoPage/
     components/
       layout/
       routing/
       ui/
-    shared/api/
+    shared/
+      api/
+      components/
     lib/
     types/
     assets/
@@ -152,7 +159,7 @@ frontend/
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/JobTracker.git
+git clone https://github.com/nawaraaaj/JobApplicationTracker
 cd JobTracker
 ```
 
@@ -268,24 +275,22 @@ The current repository does not include a separate frontend deployment workflow 
 
 ## Architecture Decisions
 
-- `Domain` is intentionally dependency-free and holds entities plus enum definitions.
-- `Application` contains feature-specific commands, queries, DTOs, and interfaces.
-- `Infrastructure` implements persistence, auth, hashing, and DI wiring.
-- `WebAPI` composes the whole backend and exposes API controllers.
-- CQRS vertical slices were chosen to keep feature code close together and reduce generic service/repository abstraction.
-- `Result<T>` is used for explicit success/failure modeling instead of throwing exceptions for normal control flow.
-- `JobApplication.CurrentStatus` is denormalized for cheaper reads, while `StatusHistory` remains the source of truth for the timeline.
-- FluentMigrator is used instead of EF migrations to support future stored procedures and analytics-driven migration needs.
-- Mapping is handled with explicit DTOs and handlers rather than AutoMapper.
+- `Domain` is dependency-free and holds core entities and enums.
+- `Application` contains feature commands, queries, DTOs, and interfaces.
+- `Infrastructure` implements persistence, auth, hashing, and service wiring.
+- `WebAPI` composes the backend and exposes API controllers.
+- CQRS vertical slices keep feature behavior grouped and avoid generic service abstractions.
+- `Result<T>` models success/failure explicitly instead of throwing exceptions during normal flow.
+- FluentMigrator runs at startup to apply database migrations.
+- Mapping is handled with explicit DTOs in handlers rather than AutoMapper.
 
 ## Status / Roadmap
 
-- Auth flows for register/login are implemented.
-- Dashboard page and route layout are implemented.
-- Job application domain entities and CQRS scaffolding exist in `Application/Features/JobApplications`.
-- `JobApplicationController` is present as a scaffold, but job application endpoints are not yet implemented.
-- Several protected frontend routes currently render placeholder pages (`/applications`, `/pipeline`, `/settings`, `/profile`, `/help`).
-- No backend test project is included yet.
+- Auth flows for register, login, and refresh token are implemented in backend and exposed via `AuthController`.
+- Job application CRUD endpoints and change-status support are implemented in `JobApplicationController`.
+- Status history is tracked in backend domain entities and returned via job application details.
+- Dashboard summary endpoint is implemented in `DashboardController`.
+- Frontend routes are implemented for `/dashboard`, `/applications`, `/applications/:id` and `/pipeline`.
 
 ## License
 
