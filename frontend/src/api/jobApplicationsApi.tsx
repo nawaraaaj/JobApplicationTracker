@@ -34,3 +34,10 @@ export const changeStatus = async (id: string, data: ChangeJobApplicationStatusR
 export const remove = async (id: string): Promise<void> => {
     await axiosClient.delete(`/jobapplication/delete/${id}`);
 };
+
+export const jobApplicationKeys = {
+    all: ["jobApplications"] as const,
+    lists: () => [...jobApplicationKeys.all, "list"] as const,
+    details: () => [...jobApplicationKeys.all, "detail"] as const,
+    detail: (id: string) => [...jobApplicationKeys.details(), id] as const,
+};

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import {
   Loader2, User, Mail, ArrowRight, Lock, Eye, EyeOff,
 } from "lucide-react";
@@ -21,10 +22,20 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const registerMutation = useMutation({
+    mutationFn: (data: RegisterRequest) => register(data),
+    onSuccess: () => {
+      toast.success("Account created successfully.");
+      navigate("/dashboard");
+    },
+    onError: (err) => {
+      const message = err instanceof Error ? err.message : "An unexpected error occurred.";
+      toast.error(message);
+    },
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -46,36 +57,28 @@ export default function RegisterPage() {
     return null;
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
 
     const validationError = validate();
     if (validationError) {
-      setError(validationError);
       toast.error(validationError);
       return;
     }
 
-    setLoading(true);
-
-    try {
-      await register({
-        ...form,
-        name: form.name.trim(),
-        email: form.email.trim(),
-      });
-
-      toast.success("Account created successfully.");
-      navigate("/dashboard");
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "An unexpected error occurred.";
-      setError(message);
-      toast.error(message);
-    } finally {
-      setLoading(false);
-    }
+    registerMutation.mutate({
+      ...form,
+      name: form.name.trim(),
+      email: form.email.trim(),
+    });
   };
+
+  const errorMessage =
+    registerMutation.isError
+      ? registerMutation.error instanceof Error
+        ? registerMutation.error.message
+        : "An unexpected error occurred."
+      : null;
 
   return (
     <AuthLayout
@@ -100,7 +103,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="John Doe"
               autoComplete="name"
-              disabled={loading}
+              disabled={registerMutation.isPending}
               className="pl-10 bg-[#fcf9f9] border-[#c5c6cc] text-[#1b1b1c] rounded-sm focus-visible:ring-0 focus-visible:border-[#835500]"
             />
           </div>
@@ -123,7 +126,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="user@domain.com"
               autoComplete="email"
-              disabled={loading}
+              disabled={registerMutation.isPending}
               className="pl-10 bg-[#fcf9f9] border-[#c5c6cc] text-[#1b1b1c] rounded-sm focus-visible:ring-0 focus-visible:border-[#835500]"
             />
           </div>
@@ -139,7 +142,7 @@ export default function RegisterPage() {
             value={form.password}
             onChange={handleChange}
             autoComplete="new-password"
-            disabled={loading}
+            disabled={registerMutation.isPending}
             className="pl-10 pr-10 bg-[#fcf9f9] border-[#c5c6cc] text-[#1b1b1c] rounded-sm focus-visible:ring-0 focus-visible:border-[#835500]"
           />
 
@@ -166,7 +169,7 @@ export default function RegisterPage() {
             value={form.confirmPassword}
             onChange={handleChange}
             autoComplete="new-password"
-            disabled={loading}
+            disabled={registerMutation.isPending}
             className="pl-10 pr-10 bg-[#fcf9f9] border-[#c5c6cc] text-[#1b1b1c] rounded-sm focus-visible:ring-0 focus-visible:border-[#835500]"
           />
 
@@ -183,18 +186,18 @@ export default function RegisterPage() {
           </button>
         </div>
 
-        {error && (
+        {errorMessage && (
           <div className="rounded-sm border border-[#ba1a1a]/30 bg-[#ffdad6] p-3 text-sm text-[#93000a] font-['IBM_Plex_Mono']">
-            {error}
+            {errorMessage}
           </div>
         )}
 
         <Button
           type="submit"
-          disabled={loading}
+          disabled={registerMutation.isPending}
           className="w-full h-11 bg-[#050e1a] hover:bg-[#1b2430] text-white font-['IBM_Plex_Mono'] text-xs uppercase tracking-wider rounded-none border border-[#050e1a] flex items-center justify-center gap-2"
         >
-          {loading ? (
+          {registerMutation.isPending ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" /> Creating Account...
             </>

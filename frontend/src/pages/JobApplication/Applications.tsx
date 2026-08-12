@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, X } from "lucide-react";
@@ -11,7 +11,14 @@ import type {
   UpdateJobApplicationRequest,
 } from "@/types/jobApplications.types";
 import { JobApplicationList } from "./JobApplicationList";
-import { getAll, getById, create, update, remove } from "../../api/jobApplicaitionsApi";
+import { getById } from "../../api/jobApplicationsApi";
+import {
+  useJobApplications,
+  useCreateJobApplication,
+  useUpdateJobApplication,
+  useDeleteJobApplication,
+} from "../../hooks/useJobApplications";
+import { toast } from "sonner";
 
 type PanelState =
   | { open: false }
@@ -21,14 +28,13 @@ type PanelState =
 export function Applications() {
   const navigate = useNavigate();
   const [panel, setPanel] = useState<PanelState>({ open: false });
-  const [applications, setApplications] = useState<JobApplicationListItemDto[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [searchTerm, setSearchTerm] = useState("");
-
   const [deleteTarget, setDeleteTarget] = useState<JobApplicationListItemDto | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+
+  const { data: applications = [], isPending: isLoading } = useJobApplications();
+  const createMutation = useCreateJobApplication();
+  const updateMutation = useUpdateJobApplication();
+  const deleteMutation = useDeleteJobApplication();
 
   const filteredApplications = applications.filter((app) => {
     const term = searchTerm.trim().toLowerCase();
@@ -39,44 +45,6 @@ export function Applications() {
     );
   });
 
-  const fetchApplications = async () => {
-    setIsLoading(true);
-    try {
-      const data = await getAll();
-      setApplications(data);
-    } catch (error) {
-      console.error("Failed to load applications:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      setIsLoading(true);
-      try {
-        const data = await getAll();
-        if (!cancelled) {
-          setApplications(data);
-        }
-      } catch (error) {
-        console.error("Failed to load applications:", error);
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   const openCreate = () => setPanel({ open: true, mode: "create" });
 
   const openUpdate = async (application: JobApplicationListItemDto) => {
@@ -85,6 +53,7 @@ export function Applications() {
       setPanel({ open: true, mode: "update", application: full });
     } catch (error) {
       console.error("Failed to load application details:", error);
+      toast.error("Failed to load application details");
     }
   };
 
@@ -94,44 +63,19 @@ export function Applications() {
 
   const closePanel = () => setPanel({ open: false });
 
-  const handleCreate = async (data: CreateJobApplicationRequest) => {
-    setIsSubmitting(true);
-    try {
-      await create(data);
-      await fetchApplications();
-      closePanel();
-    } catch (error) {
-      console.error("Failed to create application:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleCreate = (data: CreateJobApplicationRequest) => {
+    createMutation.mutate(data, { onSuccess: closePanel });
   };
 
-  const handleUpdate = async (data: UpdateJobApplicationRequest) => {
-    setIsSubmitting(true);
-    try {
-      await update(data);
-      await fetchApplications();
-      closePanel();
-    } catch (error) {
-      console.error("Failed to update application:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleUpdate = (data: UpdateJobApplicationRequest) => {
+    updateMutation.mutate(data, { onSuccess: closePanel });
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = () => {
     if (!deleteTarget) return;
-    setIsDeleting(true);
-    try {
-      await remove(deleteTarget.id);
-      await fetchApplications();
-      setDeleteTarget(null);
-    } catch (error) {
-      console.error("Failed to delete application:", error);
-    } finally {
-      setIsDeleting(false);
-    }
+    deleteMutation.mutate(deleteTarget.id, {
+      onSuccess: () => setDeleteTarget(null),
+    });
   };
 
   return (
@@ -187,7 +131,7 @@ export function Applications() {
           mode="create"
           onCancel={closePanel}
           onSubmit={handleCreate}
-          isSubmitting={isSubmitting}
+          isSubmitting={createMutation.isPending}
         />
       )}
 
@@ -197,14 +141,14 @@ export function Applications() {
           initialData={panel.application}
           onCancel={closePanel}
           onSubmit={handleUpdate}
-          isSubmitting={isSubmitting}
+          isSubmitting={updateMutation.isPending}
         />
       )}
 
       <ConfirmDialog
         open={!!deleteTarget}
         onOpenChange={(open) => {
-          if (!open && !isDeleting) setDeleteTarget(null);
+          if (!open && !deleteMutation.isPending) setDeleteTarget(null);
         }}
         title="Delete this application?"
         description={
@@ -215,7 +159,7 @@ export function Applications() {
         confirmLabel="Delete"
         cancelLabel="Cancel"
         variant="destructive"
-        isLoading={isDeleting}
+        isLoading={deleteMutation.isPending}
         onConfirm={handleDeleteConfirm}
       />
     </div>

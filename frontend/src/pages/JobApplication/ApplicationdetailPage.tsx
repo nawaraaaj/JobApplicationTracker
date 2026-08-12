@@ -1,76 +1,33 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { ArrowLeft, Pencil, Trash2, MapPin, Banknote, CalendarDays, Building2 } from "lucide-react";
 import { JobApplicationForm } from "./JobApplicationForm";
 import { ConfirmDialog } from "../../components/layout/ConfirmDialog";
-import type { JobApplicationDto, UpdateJobApplicationRequest } from "../../types/jobApplications.types";
-import { getById, update, remove } from "../../api/jobApplicaitionsApi";
+import type { UpdateJobApplicationRequest } from "../../types/jobApplications.types";
 import { formatDateTime } from "../../lib/dateUtil";
 import { formatStatus } from "../../lib/formatStatus";
+import { useJobApplication, useUpdateJobApplication, useDeleteJobApplication } from "../../hooks/useJobApplications";
 
 export function ApplicationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [application, setApplication] = useState<JobApplicationDto | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
-
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    if (!id) return;
-    let cancelled = false;
+  const { data: application, isPending: isLoading, isError: notFound } = useJobApplication(id!);
+  const updateMutation = useUpdateJobApplication();
+  const deleteMutation = useDeleteJobApplication();
 
-    async function load() {
-      setIsLoading(true);
-      setNotFound(false);
-      try {
-        const data = await getById(id!);
-        if (!cancelled) setApplication(data);
-      } catch (error) {
-        console.error("Failed to load application:", error);
-        if (!cancelled) setNotFound(true);
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    }
-
-    load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
-
-  const handleUpdate = async (data: UpdateJobApplicationRequest) => {
-    setIsSubmitting(true);
-    try {
-      await update(data);
-      const refreshed = await getById(data.id);
-      setApplication(refreshed);
-      setIsEditOpen(false);
-    } catch (error) {
-      console.error("Failed to update application:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleUpdate = (data: UpdateJobApplicationRequest) => {
+    updateMutation.mutate(data, { onSuccess: () => setIsEditOpen(false) });
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = () => {
     if (!application) return;
-    setIsDeleting(true);
-    try {
-      await remove(application.id);
-      navigate("/applications");
-    } catch (error) {
-      console.error("Failed to delete application:", error);
-      setIsDeleting(false);
-    }
+    deleteMutation.mutate(application.id, {
+      onSuccess: () => navigate("/applications"),
+    });
   };
 
   if (isLoading) {
@@ -242,9 +199,8 @@ export function ApplicationDetailPage() {
               {sortedHistory.map((entry, i) => (
                 <li key={entry.id} className="relative flex flex-col gap-1 pl-4">
                   <span
-                    className={`absolute left-0 top-1.5 h-2 w-2 rounded-full ${
-                      i === 0 ? "bg-[#835500]" : "bg-[#050e1a]/25"
-                    }`}
+                    className={`absolute left-0 top-1.5 h-2 w-2 rounded-full ${i === 0 ? "bg-[#835500]" : "bg-[#050e1a]/25"
+                      }`}
                     aria-hidden="true"
                   />
                   {i !== sortedHistory.length - 1 && (
@@ -275,21 +231,21 @@ export function ApplicationDetailPage() {
           initialData={application}
           onCancel={() => setIsEditOpen(false)}
           onSubmit={handleUpdate}
-          isSubmitting={isSubmitting}
+          isSubmitting={updateMutation.isPending}
         />
       )}
 
       <ConfirmDialog
         open={isDeleteOpen}
         onOpenChange={(open) => {
-          if (!open && !isDeleting) setIsDeleteOpen(false);
+          if (!open && !deleteMutation.isPending) setIsDeleteOpen(false);
         }}
         title="Delete this application?"
         description={`This will permanently remove "${application.jobTitle}" at ${application.companyName}. This action cannot be undone.`}
         confirmLabel="Delete"
         cancelLabel="Cancel"
         variant="destructive"
-        isLoading={isDeleting}
+        isLoading={deleteMutation.isPending}
         onConfirm={handleDeleteConfirm}
       />
     </div>

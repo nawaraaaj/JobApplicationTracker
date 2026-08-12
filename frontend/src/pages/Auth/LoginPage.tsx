@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Loader2, Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import {
+  Loader2,
+  Mail,
+  Lock,
+  ArrowRight,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { toast } from "sonner";
 import type { LoginRequest } from "../../types/auth.types";
 import { Button } from "@/components/ui/button";
@@ -18,9 +26,23 @@ export default function LoginPage() {
     password: "",
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const loginMutation = useMutation({
+    mutationFn: (credentials: LoginRequest) => login(credentials),
+    onSuccess: () => {
+      toast.success("Logged in successfully.");
+      navigate("/dashboard");
+    },
+    onError: (err) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "An unexpected error occurred.";
+
+      toast.error(message);
+    },
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({
@@ -29,35 +51,25 @@ export default function LoginPage() {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
 
     const email = form.email.trim();
     const password = form.password;
 
     if (!email || !password) {
-      const message = "Please enter both email and password.";
-      setError(message);
-      toast.error(message);
+      toast.error("Please enter both email and password.");
       return;
     }
 
-    setLoading(true);
-
-    try {
-      await login({ email, password });
-      toast.success("Logged in successfully.");
-      navigate("/dashboard");
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "An unexpected error occurred.";
-
-      setError(message);
-      toast.error(message);
-    } finally {
-      setLoading(false);
-    }
+    loginMutation.mutate({ email, password });
   };
+
+  const errorMessage = loginMutation.isError
+    ? loginMutation.error instanceof Error
+      ? loginMutation.error.message
+      : "An unexpected error occurred."
+    : null;
 
   return (
     <AuthLayout
@@ -85,7 +97,7 @@ export default function LoginPage() {
               onChange={handleChange}
               placeholder="user@domain.com"
               autoComplete="email"
-              disabled={loading}
+              disabled={loginMutation.isPending}
               className="pl-10 bg-[#fcf9f9] border-[#c5c6cc] text-[#1b1b1c] rounded-sm focus-visible:ring-0 focus-visible:border-[#835500]"
             />
           </div>
@@ -118,7 +130,7 @@ export default function LoginPage() {
               value={form.password}
               onChange={handleChange}
               autoComplete="current-password"
-              disabled={loading}
+              disabled={loginMutation.isPending}
               className="pl-10 pr-10 bg-[#fcf9f9] border-[#c5c6cc] text-[#1b1b1c] rounded-sm focus-visible:ring-0 focus-visible:border-[#835500]"
             />
 
@@ -137,18 +149,18 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {error && (
+        {errorMessage && (
           <div className="rounded-sm border border-[#ba1a1a]/30 bg-[#ffdad6] p-3 font-['IBM_Plex_Mono'] text-sm text-[#93000a]">
-            {error}
+            {errorMessage}
           </div>
         )}
 
         <Button
           type="submit"
-          disabled={loading}
+          disabled={loginMutation.isPending}
           className="flex h-11 w-full items-center justify-center gap-2 rounded-none border border-[#050e1a] bg-[#050e1a] font-['IBM_Plex_Mono'] text-xs uppercase tracking-wider text-white hover:bg-[#1b2430]"
         >
-          {loading ? (
+          {loginMutation.isPending ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
               Authenticating...

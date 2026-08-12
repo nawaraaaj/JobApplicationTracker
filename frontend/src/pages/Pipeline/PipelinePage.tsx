@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { getAll, changeStatus } from "../../api/jobApplicaitionsApi";
+import { getAll, changeStatus } from "../../api/jobApplicationsApi";
 import type { ApplicationStatus, JobApplicationListItemDto } from "../../types/jobApplications.types";
 import { COLUMNS, COLUMN_STATUSES, STATUS_TO_COLUMN, groupByColumn, type Column } from "../../lib/Kanban";
 import { KanbanCard } from "./KanbanCard";
