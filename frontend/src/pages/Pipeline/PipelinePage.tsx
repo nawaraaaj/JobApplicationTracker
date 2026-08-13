@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { getAll, changeStatus } from "../../api/jobApplicationsApi";
 import type { ApplicationStatus, JobApplicationListItemDto } from "../../types/jobApplications.types";
@@ -13,41 +14,41 @@ interface PendingDrop {
 }
 
 export function PipelinePage() {
-  const [applications, setApplications] = useState<JobApplicationListItemDto[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
   const [pendingDrop, setPendingDrop] = useState<PendingDrop | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
+  const {
+    data: applications = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["jobApplications"],
+    queryFn: getAll,
+  });
 
-    async function load() {
-      setIsLoading(true);
-      try {
-        const data = await getAll();
-        if (!cancelled) {
-          setApplications(data);
-        }
-      } catch (err) {
-        console.error("Failed to load applications:", err);
-        if (!cancelled) {
-          setError("Failed to load applications.");
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const statusMutation = useMutation({
+    mutationFn: ({
+      applicationId,
+      status,
+      notes,
+    }: {
+      applicationId: string;
+      status: ApplicationStatus;
+      notes: string;
+    }) => changeStatus(applicationId, { status, notes: notes || undefined }),
+    onSuccess: (_data, { applicationId, status }) => {
+      queryClient.setQueryData<JobApplicationListItemDto[]>(["jobApplications"], (prev) =>
+        prev?.map((app) => (app.id === applicationId ? { ...app, currentStatus: status } : app))
+      );
+      toast.success("Status updated");
+      setPendingDrop(null);
+    },
+    onError: (err) => {
+      console.error("Failed to change status:", err);
+      toast.error("Couldn't update status. Try again.");
+    },
+  });
 
   function handleDragStart(e: React.DragEvent, applicationId: string) {
     e.dataTransfer.setData("text/plain", applicationId);
@@ -64,21 +65,8 @@ export function PipelinePage() {
     setDragOverColumn((current) => (current === column ? null : current));
   }
 
-  async function applyStatusChange(applicationId: string, status: ApplicationStatus, notes: string) {
-    setIsSaving(true);
-    try {
-      await changeStatus(applicationId, { status, notes: notes || undefined });
-      setApplications((prev) =>
-        prev.map((app) => (app.id === applicationId ? { ...app, currentStatus: status } : app))
-      );
-      toast.success("Status updated");
-      setPendingDrop(null);
-    } catch (err) {
-      console.error("Failed to change status:", err);
-      toast.error("Couldn't update status. Try again.");
-    } finally {
-      setIsSaving(false);
-    }
+  function applyStatusChange(applicationId: string, status: ApplicationStatus, notes: string) {
+    statusMutation.mutate({ applicationId, status, notes });
   }
 
   function handleDrop(e: React.DragEvent, column: Column) {
@@ -105,8 +93,8 @@ export function PipelinePage() {
     return <div className="p-6 font-mono text-sm text-[#44474c]">Loading pipeline…</div>;
   }
 
-  if (error) {
-    return <div className="p-6 font-mono text-sm text-red-600">{error}</div>;
+  if (isError) {
+    return <div className="p-6 font-mono text-sm text-red-600">Failed to load applications.</div>;
   }
 
   const grouped = groupByColumn(applications);
@@ -170,7 +158,7 @@ export function PipelinePage() {
         <StatusSelectionModal
           companyName={pendingDrop.companyName}
           options={COLUMN_STATUSES[pendingDrop.column]}
-          isSaving={isSaving}
+          isSaving={statusMutation.isPending}
           onCancel={() => setPendingDrop(null)}
           onSave={(status, notes) => applyStatusChange(pendingDrop.applicationId, status, notes)}
         />

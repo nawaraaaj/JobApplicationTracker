@@ -1,46 +1,13 @@
-import { useEffect, useState } from "react";
 import { Radio, LayoutGrid, TrendingUp, Trophy, Clock, Briefcase } from "lucide-react";
 import { useAuth } from "../../lib/Auth/AuthContext";
-import type { DashboardSummary } from "../../types/dashboard.types";
-import { getSummary } from "@/api/dashboardApi";
 import { SummaryCard } from "./SummaryCard";
 import { BreakdownList } from "./BreakdownList";
 import { PipelineFunnel } from "./PipelineFunnel";
+import { useDashboardSummary } from "../../hooks/useDashboard";
 
 function DashboardPage() {
   const { user } = useAuth();
-  const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadSummary() {
-      setIsLoading(true);
-      try {
-        const data = await getSummary();
-        if (!cancelled) {
-          setSummary(data);
-        }
-      } catch (err) {
-        console.error("Failed to load dashboard summary:", err);
-        if (!cancelled) {
-          setError(true);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    loadSummary();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const { data: summary, isPending: isLoading, isError } = useDashboardSummary();
 
   if (isLoading) {
     return (
@@ -50,7 +17,7 @@ function DashboardPage() {
     );
   }
 
-  if (error || !summary) {
+  if (isError || !summary) {
     return (
       <div className="flex items-center justify-center py-24">
         <span className="mono text-[13px] text-[#ba1a1a] uppercase tracking-widest">
