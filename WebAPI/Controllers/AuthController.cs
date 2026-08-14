@@ -1,6 +1,7 @@
-﻿using Application.Features.Auth.Commands.Login;
-using Application.Features.Auth.Commands.Register;
+﻿using Application.Features.Auth.Commands.GoogleLogin;
+using Application.Features.Auth.Commands.Login;
 using Application.Features.Auth.Commands.RefreshToken;
+using Application.Features.Auth.Commands.Register;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Extensions;
@@ -27,6 +28,14 @@ public class AuthController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
+        return result.ToActionResult();
+    }
+
+    [HttpPost("google")]
+    public async Task<IActionResult> GoogleLogin(GoogleLoginRequest request)
+    {
+        var command = new GoogleLoginCommand(request.IdToken);
+        var result = await sender.Send(command);
         return result.ToActionResult();
     }
 
