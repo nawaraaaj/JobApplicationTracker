@@ -2,6 +2,7 @@
 using Application.Features.Auth.Commands.Login;
 using Application.Features.Auth.Commands.RefreshToken;
 using Application.Features.Auth.Commands.Register;
+using Application.Features.Auth.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Extensions;
@@ -32,7 +33,7 @@ public class AuthController(ISender sender) : ControllerBase
     }
 
     [HttpPost("google")]
-    public async Task<IActionResult> GoogleLogin(GoogleLoginRequest request)
+    public async Task<IActionResult> GoogleLogin(GoogleLoginRequestDto request)
     {
         var command = new GoogleLoginCommand(request.IdToken);
         var result = await sender.Send(command);

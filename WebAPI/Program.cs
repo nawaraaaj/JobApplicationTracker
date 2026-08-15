@@ -1,10 +1,13 @@
 using Application;
+using DotNetEnv;
 using Infrastructure;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using WebAPI;
 using WebAPI.Exceptions;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
