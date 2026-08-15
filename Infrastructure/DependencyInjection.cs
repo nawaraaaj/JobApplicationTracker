@@ -42,6 +42,7 @@ public static class DependencyInjection
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<ITokenHasher, TokenHasher>();
         services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
+        services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
         // Repositories
         services.AddScoped<IAuthRepository, AuthRepository>();

@@ -21,7 +21,15 @@ public class GoogleLoginCommandHandler(
     public async Task<Result<AuthResponseDto>> Handle(
         GoogleLoginCommand request, CancellationToken cancellationToken)
     {
-        var payload = await googleAuthService.ValidateIdTokenAsync(request.IdToken);
+        var tokenResult = await googleAuthService.ValidateIdTokenAsync(request.IdToken);
+
+        if (!tokenResult.IsSuccess)
+        {
+            logger.LogInformation("Google login rejected — token validation failed: {Error}", tokenResult.Error!.Message);
+            return Result<AuthResponseDto>.Failure(tokenResult.Error!);
+        }
+
+        var payload = tokenResult.Value!;
 
         if (!payload.EmailVerified)
         {
@@ -40,7 +48,7 @@ public class GoogleLoginCommandHandler(
                 Id = Guid.NewGuid(),
                 Name = payload.Name,
                 Email = normalizedEmail,
-                PasswordHash = null,
+                PasswordHash = string.Empty,
                 AuthProvider = AuthProvider.Google
             };
 

@@ -1,8 +1,9 @@
 ﻿using Application.Common.Models;
+using Application.Common.Results;
 
 namespace Application.Interfaces;
 
 public interface IGoogleAuthService
 {
-    Task<GoogleTokenPayload> ValidateIdTokenAsync(string idToken);
+    Task<Result<GoogleTokenPayload>> ValidateIdTokenAsync(string idToken);
 }
