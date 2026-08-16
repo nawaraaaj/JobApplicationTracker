@@ -7,6 +7,7 @@ export interface AuthContextValue {
     isLoading: boolean;
     login: (data: LoginRequest) => Promise<void>;
     register: (data: RegisterRequest) => Promise<void>;
+    googleLogin: (idToken: string) => Promise<void>;
     logout: () => void;
 }
 
