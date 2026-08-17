@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "../../lib/Auth/AuthContext";
 import AuthLayout from "../Auth/AuthLayout";
+import GoogleSignInButton from "./GoogleSignInButton";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -184,6 +185,10 @@ export default function RegisterPage() {
               <Eye className="h-4 w-4" />
             )}
           </button>
+        </div>
+
+        <div>
+          <GoogleSignInButton />
         </div>
 
         {errorMessage && (

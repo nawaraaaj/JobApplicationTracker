@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Domain.Enums;
 
 namespace Domain.Entities;
 
@@ -7,4 +7,5 @@ public class User : BaseEntity
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
+    public AuthProvider AuthProvider { get; set; } = AuthProvider.Local;
 }

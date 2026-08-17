@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { AuthContext } from "./AuthContext";
 import type { UserDto, LoginRequest, RegisterRequest } from "../../types/auth.types";
-import { login as loginApi, register as registerApi } from "../../api/authApi";
+import { login as loginApi, register as registerApi, googleLogin as googleLoginApi } from "../../api/authApi";
 
 function getStoredUser(): UserDto | null {
     const storedUser = localStorage.getItem("user");
@@ -33,6 +33,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         persistSession(response.accessToken, response.refreshToken, response.user);
     };
 
+    const googleLogin = async (idToken: string) => {
+        const response = await googleLoginApi(idToken);
+        persistSession(response.accessToken, response.refreshToken, response.user);
+    };
+
     const logout = () => {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
@@ -42,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return (
         <AuthContext.Provider
-            value={{ user, isAuthenticated: !!user, isLoading: false, login, register, logout }}
+            value={{ user, isAuthenticated: !!user, isLoading: false, login, register, googleLogin, logout }}
         >
             {children}
         </AuthContext.Provider>
