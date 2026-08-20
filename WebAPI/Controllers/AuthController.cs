@@ -5,12 +5,14 @@ using Application.Features.Auth.Commands.Register;
 using Application.Features.Auth.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using WebAPI.Extensions;
 
 namespace WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("auth")]
 public class AuthController(ISender sender) : ControllerBase
 {
     [HttpPost("register")]
