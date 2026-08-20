@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using WebAPI;
 using WebAPI.Exceptions;
+using WebAPI.Extensions;
 
 Env.Load();
 
@@ -40,6 +41,7 @@ builder.Services.AddMediatR(cfg =>
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddPresentation(builder.Configuration);
+builder.Services.AddRateLimitingPolicies();
 
 var app = builder.Build();
 
@@ -58,6 +60,7 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowReactApp");
 
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
