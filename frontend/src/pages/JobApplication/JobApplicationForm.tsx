@@ -27,15 +27,9 @@ const SOURCE_OPTIONS: { value: ApplicationSource; label: string }[] = [
 
 const STATUS_OPTIONS: { value: ApplicationStatus; label: string }[] = [
   { value: "Applied", label: "Applied" },
-  { value: "OnlineAssessment", label: "Online Assessment" },
-  { value: "PhoneScreen", label: "Phone Screen" },
-  { value: "TechnicalInterview", label: "Technical Interview" },
-  { value: "OnsiteInterview", label: "Onsite Interview" },
-  { value: "OfferReceived", label: "Offer Received" },
-  { value: "OfferAccepted", label: "Offer Accepted" },
-  { value: "Rejected", label: "Rejected" },
-  { value: "Withdrawn", label: "Withdrawn" },
-  { value: "Ghosted", label: "Ghosted" },
+  { value: "Interview", label: "Interview" },
+  { value: "Offer", label: "Offer" },
+  { value: "Closed", label: "Closed" },
 ];
 
 const WORK_MODES: {

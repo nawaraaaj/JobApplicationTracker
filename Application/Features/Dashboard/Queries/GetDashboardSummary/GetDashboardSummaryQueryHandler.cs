@@ -13,14 +13,6 @@ public class GetDashboardSummaryQueryHandler(
     ILogger<GetDashboardSummaryQueryHandler> logger
     ) : IRequestHandler<GetDashboardSummaryQuery, Result<DashboardSummaryDto>>
 {
-    private static readonly ApplicationStatus[] TerminalStatuses =
-    [
-        ApplicationStatus.Rejected,
-        ApplicationStatus.Withdrawn,
-        ApplicationStatus.Ghosted,
-        ApplicationStatus.OfferAccepted
-    ];
-
     public async Task<Result<DashboardSummaryDto>> Handle(GetDashboardSummaryQuery request, CancellationToken cancellationToken)
     {
         var userId = currentUserService.UserId;
@@ -35,7 +27,7 @@ public class GetDashboardSummaryQueryHandler(
         var totalCount = stageCounts.Sum(s => s.Count);
 
         var activeCount = stageCounts
-            .Where(s => !TerminalStatuses.Contains(s.Status))
+            .Where(s => s.Status != ApplicationStatus.Closed)
             .Sum(s => s.Count);
 
         var respondedCount = stageCounts
@@ -47,7 +39,7 @@ public class GetDashboardSummaryQueryHandler(
             : 0;
 
         var offersCount = stageCounts
-            .Where(s => s.Status is ApplicationStatus.OfferReceived or ApplicationStatus.OfferAccepted)
+            .Where(s => s.Status == ApplicationStatus.Offer)
             .Sum(s => s.Count);
 
         var dashboardSummary = new DashboardSummaryDto
@@ -61,10 +53,7 @@ public class GetDashboardSummaryQueryHandler(
             WorkModeBreakdown = workModeBreakdown
         };
 
-        logger.LogInformation(
-       "Dashboard summary computed for user {UserId}: {TotalApplications} applications, {ActiveCount} active, {OffersCount} offers", userId, totalCount, activeCount, offersCount);
-
-
+        logger.LogInformation("Dashboard summary computed for user {UserId}: {TotalApplications} applications, {ActiveCount} active, {OffersCount} offers",userId, totalCount, activeCount, offersCount);
         return Result<DashboardSummaryDto>.Success(dashboardSummary);
     }
 }
