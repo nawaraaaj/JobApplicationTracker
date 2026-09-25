@@ -3,13 +3,7 @@
 public enum ApplicationStatus
 {
     Applied,
-    OnlineAssessment,
-    PhoneScreen,
-    TechnicalInterview,
-    OnsiteInterview,
-    OfferReceived,
-    OfferAccepted,
-    Rejected,
-    Withdrawn,
-    Ghosted
+    Interview,
+    Offer,
+    Closed
 }

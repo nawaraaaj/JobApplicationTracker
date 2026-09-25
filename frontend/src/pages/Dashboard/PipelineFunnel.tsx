@@ -8,8 +8,7 @@ interface PipelineFunnelProps {
 
 const COLUMN_STYLE: Record<Column, { border: string; bg: string; header: string; headerBg: string; text: string }> = {
     Applied: { border: "border-[#75777c]", bg: "bg-[#fcf9f9]", header: "text-[#44474c]", headerBg: "bg-[#f6f3f4]", text: "text-[#1b1b1c]" },
-    Screening: { border: "border-[#9c876f]/60", bg: "bg-[#9c876f]/5", header: "text-[#734a19]", headerBg: "bg-[#9c876f]/10", text: "text-[#1b1b1c]" },
-    Interviewing: { border: "border-[#835500]", bg: "bg-[#835500]/5", header: "text-[#835500]", headerBg: "bg-[#835500]/10", text: "text-[#835500]" },
+    Interview: { border: "border-[#835500]", bg: "bg-[#835500]/5", header: "text-[#835500]", headerBg: "bg-[#835500]/10", text: "text-[#835500]" },
     Offer: { border: "border-[#050e1a]/60", bg: "bg-[#050e1a]/5", header: "text-[#050e1a]", headerBg: "bg-[#050e1a]/8", text: "text-[#1b1b1c]" },
     Closed: { border: "border-[#ba1a1a]/30", bg: "bg-[#ba1a1a]/[0.03]", header: "text-[#ba1a1a]/70", headerBg: "bg-[#ba1a1a]/5", text: "text-[#1b1b1c]" },
 };

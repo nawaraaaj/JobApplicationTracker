@@ -1,14 +1,8 @@
 export type ApplicationStatus =
   | "Applied"
-  | "OnlineAssessment"
-  | "PhoneScreen"
-  | "TechnicalInterview"
-  | "OnsiteInterview"
-  | "OfferReceived"
-  | "OfferAccepted"
-  | "Rejected"
-  | "Withdrawn"
-  | "Ghosted";
+  | "Interview"
+  | "Offer"
+  | "Closed";
 
 export type ApplicationSource =
   | "LinkedIn"
@@ -22,8 +16,7 @@ export type WorkMode = "Remote" | "Hybrid" | "Onsite";
 
 export type PipelineColumn =
   | "Applied"
-  | "Screening"
-  | "Interviewing"
+  | "Interview"
   | "Offer"
   | "Closed";
 
@@ -52,7 +45,7 @@ export interface UpdateJobApplicationRequest {
 }
 
 export interface ChangeJobApplicationStatusRequest {
-    status: string;
+  status: ApplicationStatus;
     notes?: string;
 }
 export interface StatusHistoryDto {
