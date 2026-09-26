@@ -40,4 +40,11 @@ public class AuthRepository(
             .Include(rt => rt.User)
             .FirstOrDefaultAsync(rt => rt.TokenHash == tokenHash, cancellationToken);
     }
+
+    public async Task<User?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        return await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+    }
 }

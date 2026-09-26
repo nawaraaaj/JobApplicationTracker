@@ -14,4 +14,5 @@ public interface IAuthRepository
 
     Task AddRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken);
     Task<RefreshToken?> GetRefreshTokenByHashAsync(string tokenHash, CancellationToken cancellationToken);
+    Task<User?> GetByIdAsync(Guid userId, CancellationToken cancellationToken);
 }
