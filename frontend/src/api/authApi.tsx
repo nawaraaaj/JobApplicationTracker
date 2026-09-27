@@ -2,7 +2,8 @@ import { axiosClient } from '../shared/api/axiosClient';
 import type {
     RegisterRequest,
     LoginRequest,
-    AuthResponse
+    AuthResponse,
+    UserDto
 } from "../types/auth.types";
 
 export const register = async (data: RegisterRequest): Promise<AuthResponse> => {
@@ -23,4 +24,13 @@ export const googleLogin = async (idToken: string): Promise<AuthResponse> => {
 export const refresh = async (refreshToken: string): Promise<AuthResponse> => {
     const response = await axiosClient.post<AuthResponse>("/auth/refresh", { refreshToken });
     return response.data;
+};
+
+export const profile = async (): Promise<UserDto> => {
+    const response = await axiosClient.get<UserDto>("/auth/profile");
+    return response.data;
+};
+
+export const userKeys = {
+    profile: () => ["users", "profile"] as const,
 };

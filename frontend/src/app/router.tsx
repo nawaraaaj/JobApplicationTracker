@@ -10,7 +10,8 @@ import { PageNotBuilt } from "../pages/NoPage/PageNotBuilt";
 import { NotFoundPage } from "../pages/NoPage/NotFoundPage";
 import { Applications } from "../pages/JobApplication/Applications";
 import { ApplicationDetailPage } from "../pages/JobApplication/ApplicationdetailPage";
-import { PipelinePage } from "@/pages/Pipeline/PipelinePage";
+import { PipelinePage } from "../pages/Pipeline/PipelinePage";
+import { ProfilePage } from "../pages/Profile/ProfilePage";
 
 export const router = createBrowserRouter([
   {
@@ -35,7 +36,7 @@ export const router = createBrowserRouter([
           { path: "/applications/:id", element: <ApplicationDetailPage /> },
           { path: "/pipeline", element: <PipelinePage/> },
           { path: "/settings", element: <PageNotBuilt title="Settings" /> },
-          { path: "/profile", element: <PageNotBuilt title="profile" /> },
+          { path: "/profile", element: <ProfilePage /> },
           { path: "/help" , element:  <PageNotBuilt title="Help" /> }
         ],
       },

@@ -3,6 +3,7 @@ using Application.Features.Auth.Commands.Login;
 using Application.Features.Auth.Commands.RefreshToken;
 using Application.Features.Auth.Commands.Register;
 using Application.Features.Auth.DTOs;
+using Application.Features.Users.Queries.GetCurrentUser;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -48,6 +49,13 @@ public class AuthController(ISender sender) : ControllerBase
     CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
+        return result.ToActionResult();
+    }
+
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new GetCurrentUserQuery(), cancellationToken);
         return result.ToActionResult();
     }
 
